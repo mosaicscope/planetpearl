@@ -386,7 +386,7 @@ html[data-mode="svg"] #thread-svg{display:block}
 /* header scene: rocking chair, coffee, gramophone */
 .nav-links a:first-child{margin-left:auto}
 .nav-links a:nth-child(4){margin-left:0}
-.nav-scene{position:absolute;left:13.5rem;top:50%;transform:translateY(-50%);transform-origin:0 50%;height:4.6rem;aspect-ratio:250/96;z-index:2;color:var(--ink);transition:transform .7s var(--ease)}
+.nav-scene{position:absolute;left:13.5rem;top:50%;transform:translateY(-50%);transform-origin:0 50%;height:4.9rem;aspect-ratio:250/112;z-index:2;color:var(--ink);transition:transform .7s var(--ease)}
 .nav-scene svg{display:block;width:100%;height:100%;overflow:visible;max-width:none}
 .nav-scene:hover,.nav-scene:focus-within{transform:translateY(-36%) scale(1.45)}
 
@@ -509,3 +509,15 @@ a.slot-card:hover::after{inset:14px;border-color:var(--berry)}
 /* a clear, empty patch where the thread comes to rest */
 .pool{height:clamp(230px,34vh,340px)}
 @media (max-width:900px){.hero-logo .plogo{width:clamp(190px,50vw,260px)}}
+
+/* gramophone controls: clear states */
+.sc-btn{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease)}
+.sc-btn .ring{transition:fill .3s,stroke .3s}
+.sc-btn:hover .ring,.sc-btn:focus-visible .ring{stroke:var(--berry);fill:rgba(255,179,198,.55)}
+.sc-btn:hover{transform:scale(1.12)}
+.sc-btn:active{transform:scale(.9)}
+.sc-btn:focus-visible{outline:2px solid var(--berry);outline-offset:2px;border-radius:50%}
+.playing [data-act="play"] .ring{stroke:var(--berry);fill:rgba(255,179,198,.4);animation:sc-pulse 1.8s ease-in-out infinite}
+@keyframes sc-pulse{50%{stroke-width:2.6}}
+.sc-tick{pointer-events:none}
+@media (prefers-reduced-motion:reduce){.playing [data-act="play"] .ring{animation:none}}
