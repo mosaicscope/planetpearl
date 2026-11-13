@@ -13,7 +13,7 @@
   function s(tag, attrs, parent) { var n = doc.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
 
   /* ---------- the drawing ---------- */
-  var svg = s('svg', { viewBox: '0 0 250 96', role: 'group', 'aria-label': 'A rocking chair with a coffee, and a gramophone' }, host);
+  var svg = s('svg', { viewBox: '0 0 250 112', role: 'group', 'aria-label': 'A rocking chair with a coffee, and a gramophone' }, host);
   var L = { fill: 'none', stroke: 'currentColor', 'stroke-width': 1.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
   function path(d, parent, extra) { var a = {}, k; for (k in L) a[k] = L[k]; a.d = d; if (extra) for (k in extra) a[k] = extra[k]; return s('path', a, parent); }
 
@@ -52,20 +52,28 @@
   s('ellipse', { cx: 227, cy: 14, rx: 6, ry: 12, transform: 'rotate(-22 227 14)', fill: 'none', stroke: 'currentColor', 'stroke-width': 1.5 }, gram);
   path('M210,30 L210,20 M218,32 L219,22', gram, { 'stroke-width': 1 });
 
-  // the little wire controls: play / volume / next
+  // the little wire controls: play / volume / next. Drawn like brass dials, with ticks and a stitched inner ring.
   var ctl = s('g', { 'class': 'sc-ctl' }, svg);
-  var btn = s('g', { 'class': 'sc-btn', 'data-act': 'play', role: 'button', tabindex: 0, 'aria-label': 'Play the gramophone' }, ctl);
-  s('circle', { cx: 150, cy: 88, r: 8, fill: 'transparent' }, btn);
-  s('circle', { cx: 150, cy: 88, r: 5.2, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.3 }, btn);
-  var iconPlay = path('M148.5,85.6 L153,88 L148.5,90.4 Z', btn, { 'stroke-width': 1.1 });
-  var iconPause = path('M148.4,85.6 L148.4,90.4 M151.6,85.6 L151.6,90.4', btn, { 'stroke-width': 1.3, opacity: 0 });
-  var knob = s('g', { 'class': 'sc-btn', 'data-act': 'vol', role: 'slider', tabindex: 0, 'aria-label': 'Volume', 'aria-valuemin': 0, 'aria-valuemax': 100 }, ctl);
-  s('circle', { cx: 172, cy: 88, r: 8, fill: 'transparent' }, knob);
-  s('circle', { cx: 172, cy: 88, r: 5.2, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.3 }, knob);
-  var pointer = path('M172,88 L172,84', knob, { 'stroke-width': 1.5 });
-  var nxt = s('g', { 'class': 'sc-btn', 'data-act': 'next', role: 'button', tabindex: 0, 'aria-label': 'Next song' }, ctl);
-  s('circle', { cx: 194, cy: 88, r: 8, fill: 'transparent' }, nxt);
-  path('M191,85.4 L195,88 L191,90.6 M197,85.4 L197,90.6', nxt, { 'stroke-width': 1.2 });
+  function dial(cx, cy, act, role, label, r) {
+    var grp = s('g', { 'class': 'sc-btn', 'data-act': act, role: role, tabindex: 0, 'aria-label': label }, ctl);
+    s('circle', { cx: cx, cy: cy, r: r + 4, fill: 'transparent' }, grp);                                   // roomy hit area
+    s('circle', { cx: cx, cy: cy, r: r, 'class': 'ring', fill: 'none', stroke: 'currentColor', 'stroke-width': 1.5 }, grp);
+    s('circle', { cx: cx, cy: cy, r: r - 2.6, fill: 'none', stroke: 'currentColor', 'stroke-width': 0.8, 'stroke-dasharray': '1.2 2', opacity: 0.7 }, grp);
+    var t = s('title', {}, grp); t.textContent = label; return grp;
+  }
+  var btn = dial(150, 95, 'play', 'button', 'Play the gramophone', 9);
+  var iconPlay = path('M147.6,90.6 L155.4,95 L147.6,99.4 Z', btn, { 'stroke-width': 1.4 });
+  var iconPause = path('M147.6,90.6 L147.6,99.4 M152.4,90.6 L152.4,99.4', btn, { 'stroke-width': 1.8, opacity: 0 });
+  var knob = dial(180, 95, 'vol', 'slider', 'Volume', 9);
+  knob.setAttribute('aria-valuemin', 0); knob.setAttribute('aria-valuemax', 100);
+  for (var tk = 0; tk <= 8; tk++) {                                                                       // tick marks round the dial
+    var ta = (-135 + tk * 33.75) * Math.PI / 180, x1 = 180 + Math.sin(ta) * 12.2, y1 = 95 - Math.cos(ta) * 12.2, x2 = 180 + Math.sin(ta) * 14.4, y2 = 95 - Math.cos(ta) * 14.4;
+    path('M' + x1.toFixed(1) + ',' + y1.toFixed(1) + ' L' + x2.toFixed(1) + ',' + y2.toFixed(1), ctl, { 'stroke-width': 1, opacity: 0.65, 'class': 'sc-tick' });
+  }
+  var pointer = path('M180,95 L180,88.4', knob, { 'stroke-width': 2 });
+  s('circle', { cx: 180, cy: 95, r: 1.4, fill: 'currentColor' }, knob);
+  var nxt = dial(210, 95, 'next', 'button', 'Next song', 9);
+  path('M205.6,90.8 L211.6,95 L205.6,99.2 Z M214,90.8 L214,99.2', nxt, { 'stroke-width': 1.4 });
   var tip = s('title', {}, svg); tip.textContent = 'Press play for a little music';
 
   /* ---------- state ---------- */
@@ -73,7 +81,7 @@
   var playing = false, mode = null, widget = null, frameEl = null, notesTimer = 0;
   var scUrl = window.PPStore.safe.soundcloud(C.social.soundcloud);
 
-  function paintVol() { pointer.setAttribute('transform', 'rotate(' + (-135 + vol * 270) + ' 172 88)'); knob.setAttribute('aria-valuenow', Math.round(vol * 100)); }
+  function paintVol() { pointer.setAttribute('transform', 'rotate(' + (-135 + vol * 270) + ' 180 95)'); knob.setAttribute('aria-valuenow', Math.round(vol * 100)); }
   function paintPlay() {
     iconPlay.setAttribute('opacity', playing ? 0 : 1); iconPause.setAttribute('opacity', playing ? 1 : 0);
     btn.setAttribute('aria-label', playing ? 'Pause the gramophone' : 'Play the gramophone');
