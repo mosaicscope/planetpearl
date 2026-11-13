@@ -15,6 +15,34 @@
   function secs(t) { var p = (t || '0').split(':').map(Number), s = 0; for (var i = 0; i < p.length; i++) s = s * 60 + p[i]; return s; }
   function hm(s) { var h = Math.floor(s / 3600), m = Math.round((s % 3600) / 60); return h ? h + 'h ' + m + 'm' : m + 'm'; }
 
+  /* ---------- hover to preview: a muted, looping clip plays right inside the thumbnail ---------- */
+  var canHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var active = null;
+  function stopPreview() {
+    if (!active) return;
+    var a = active; active = null; clearTimeout(a.t);
+    a.card.classList.remove('previewing');
+    if (a.frame) { var f = a.frame; f.classList.remove('on'); setTimeout(function () { f.remove(); }, 500); }
+  }
+  function attachPreview(card, box, id) {
+    if (!canHover) return;
+    var timer = 0;
+    card.addEventListener('pointerenter', function (e) {
+      if (e.pointerType === 'touch') return;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        stopPreview();
+        var f = doc.createElement('iframe'); f.className = 'pv'; f.title = ''; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+        f.allow = 'autoplay; encrypted-media'; f.loading = 'lazy';
+        f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=' + id + '&modestbranding=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&start=6';
+        box.appendChild(f); active = { card: card, frame: f, t: 0 };
+        f.addEventListener('load', function () { f.classList.add('on'); card.classList.add('previewing'); });
+      }, 420);
+    });
+    card.addEventListener('pointerleave', function () { clearTimeout(timer); if (active && active.card === card) stopPreview(); });
+    card.addEventListener('focusout', function () { clearTimeout(timer); if (active && active.card === card) stopPreview(); });
+  }
+
   /* ---------- featured: the newest film ---------- */
   var f = V.list[0];
   var fb = el('button', 'feat-btn'); fb.type = 'button'; fb.setAttribute('aria-label', 'Play: ' + f[1]);
@@ -25,7 +53,8 @@
   ft.appendChild(el('span', 'w', f[1]));
   ft.appendChild(el('span', 'go', 'Watch now ↗'));
   fb.appendChild(fi); fb.appendChild(ft);
-  fb.addEventListener('click', function () { open(f[0], f[1]); });
+  fb.addEventListener('click', function () { stopPreview(); open(f[0], f[1]); });
+  attachPreview(fb, fi, f[0]);
   feature.appendChild(fb);
 
   /* ---------- filmstrip ---------- */
@@ -37,7 +66,8 @@
     c.appendChild(th);
     c.appendChild(el('span', 'no', fmt(v[3])));
     c.appendChild(el('span', 'ti', v[1]));
-    c.addEventListener('click', function () { if (!dragged) open(v[0], v[1]); });
+    c.addEventListener('click', function () { if (!dragged) { stopPreview(); open(v[0], v[1]); } });
+    attachPreview(c, th, v[0]);
     return c;
   }
   V.list.slice(0, STRIP_N).forEach(function (v, i) { strip.appendChild(cellFor(v, i, ' reveal')); });

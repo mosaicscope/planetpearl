@@ -33,7 +33,7 @@
   root.classList.add('has-cursor');
 
   var x = -100, y = -100, tx = -100, ty = -100, rot = 0, lastDrop = { x: 0, y: 0 }, moving = 0;
-  var SEL = 'a,button,[role="button"],.doodle,summary,label';
+  var SEL = 'a,button,[role="button"],[role="slider"],.doodle,summary,label,.plogo';
 
   window.addEventListener('pointermove', function (e) {
     tx = e.clientX; ty = e.clientY; moving = 1;
