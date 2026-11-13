@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planet Pearl — Slow living, knitting &amp; quilting</title>
+  <meta name="description" content="Planet Pearl: a maker's journal from Christchurch, New Zealand. Knitting, crochet, quilting, slow living, original patterns and cosy chats.">
+  <meta name="theme-color" content="#ffe5ec">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Dancing+Script:wght@500;700&family=Inter:wght@400;500;600&family=Kavivanar&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/logo/logo-ball.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- the 3D rope draws here -->
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <header class="nav" id="nav">
+    <div class="nav-logo"><span data-plogo></span></div>
+    <nav class="nav-links" id="nav-links" aria-label="Main">
+      <a href="#watch">Watch</a>
+      <a href="#patterns">Patterns</a>
+      <a href="#shop">Shop</a>
+      <a href="#journal">Journal</a>
+      <a href="#hello">Contact</a>
+    </nav>
+    <a class="btn btn-sm" data-link="subscribe" href="#" target="_blank" rel="noopener">Subscribe</a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menu"><span></span><span></span></button>
+  </header>
+
+  <main id="main">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="top">
+      <div class="hero-pin">
+        <canvas id="film" aria-label="A ball of pink yarn slowly unravelling"></canvas>
+        <div id="ball2d" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="ta">வணக்கம்</span><i></i>Ōtautahi Christchurch, Aotearoa</p>
+          <h1><span class="write script">Planet Pearl</span></h1>
+          <p class="lede">Dear friends, come in and get cosy. Knitting, quilting, slow living and a good cup of tea.</p>
+          <div class="cta-row">
+            <a class="btn" data-link="subscribe" href="#" target="_blank" rel="noopener">Subscribe on YouTube</a>
+            <a class="link" href="#watch">Watch the journal <span class="arr">→</span></a>
+          </div>
+        </div>
+        <p class="pull" aria-hidden="true">pull the thread <span>↓</span></p>
+      </div>
+    </section>
+
+    <!-- ============ TICKER ============ -->
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-in">
+        <span>knitting</span><b>✿</b><span>quilting</span><b>✿</b><span>crochet</span><b>✿</b><span>slow living</span><b>✿</b><span>original patterns</span><b>✿</b><span>cosy chats</span><b>✿</b>
+        <span>knitting</span><b>✿</b><span>quilting</span><b>✿</b><span>crochet</span><b>✿</b><span>slow living</span><b>✿</b><span>original patterns</span><b>✿</b><span>cosy chats</span><b>✿</b>
+      </div>
+    </div>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="sec" id="about">
+      <div class="wrap about">
+        <div>
+          <p class="label reveal">The journal</p>
+          <h2 class="reveal">Unravelled<br><em>slowly.</em></h2>
+        </div>
+        <div class="about-body">
+          <p class="big reveal">Knitting chronicles, stitches and stories, crochet escapades, embroidery and patchwork magic, threads of creativity, crafty conversations and cozy chats.</p>
+          <p class="reveal">This is my making journal. I share what I'm working on, what I've made, and all the pretty yarn, fabric and notions I've found along the way, from my little Christchurch home and from creative corners all over New Zealand.</p>
+          <dl class="meta reveal">
+            <div><dt>Based in</dt><dd>Ōtautahi Christchurch</dd></div>
+            <div><dt>Archive</dt><dd>425+ films</dd></div>
+            <div><dt>Community</dt><dd>1.6K friends</dd></div>
+          </dl>
+          <span class="doodle d-right" data-doodle="fern" data-size="150"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WATCH ============ -->
+    <section class="sec" id="watch">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="label reveal">Watch</p>
+            <h2 class="reveal">The<br><em>reel.</em></h2>
+          </div>
+          <p class="sub reveal">Every film from the channel, newest first. Press play right here, no tab-hopping.</p>
+        </div>
+
+        <div id="feature" class="feature reveal"></div>
+
+        <div class="strip-head reveal">
+          <h3 class="mini">From the channel</h3>
+          <div class="strip-nav"><button type="button" id="prev" aria-label="Earlier films">←</button><button type="button" id="next" aria-label="Later films">→</button></div>
+        </div>
+        <div class="strip" id="strip" tabindex="0" aria-label="Films from the Planet Pearl channel"></div>
+        <div class="cta-row reveal">
+          <button type="button" class="btn" id="playall">Play every film</button>
+          <a class="link" data-link="videos" href="#" target="_blank" rel="noopener">Browse all 425+ on YouTube <span class="arr">↗</span></a>
+        </div>
+
+        <h3 class="mini reveal">The whole archive</h3>
+        <div class="archive-tools reveal">
+          <label class="sr" for="q">Search the films</label>
+          <input type="search" id="q" placeholder="Search every film… try quilt, retreat, garden" autocomplete="off">
+          <span class="count" id="count" aria-live="polite"></span>
+        </div>
+        <div class="vgrid" id="vgrid"></div>
+        <div class="cta-row"><button type="button" class="btn" id="more">Show more films</button></div>
+
+        <h3 class="mini reveal">Or browse by mood</h3>
+        <div class="mood">
+          <ol class="index">
+          <li class="reveal"><a data-link="playlists" href="#" target="_blank" rel="noopener"><span class="n">01</span><span class="t">Maker's journal</span><span class="d">Knitting chronicles, crochet escapades, embroidery and patchwork magic.</span><span class="go">Watch <span class="arr">↗</span></span></a></li>
+          <li class="reveal"><a data-link="playlists" href="#" target="_blank" rel="noopener"><span class="n">02</span><span class="t">A maker's journey</span><span class="d">Discovering New Zealand's creative corners: yarn stores, retreats and fibre arts down under.</span><span class="go">Watch <span class="arr">↗</span></span></a></li>
+          <li class="reveal"><a data-link="playlists" href="#" target="_blank" rel="noopener"><span class="n">03</span><span class="t">Slow living &amp; homemaking</span><span class="d">Garden, gather and craft. Savouring the simple, one cosy day at a time.</span><span class="go">Watch <span class="arr">↗</span></span></a></li>
+          <li class="reveal"><a data-link="playlists" href="#" target="_blank" rel="noopener"><span class="n">04</span><span class="t">Journaling my makes</span><span class="d">Pens, paper and stickers: how I plan and track my projects.</span><span class="go">Watch <span class="arr">↗</span></span></a></li>
+          <li class="reveal"><a data-link="playlists" href="#" target="_blank" rel="noopener"><span class="n">05</span><span class="t">Peppercorn trails</span><span class="d">Cooking from scratch, with love, from my kitchen.</span><span class="go">Watch <span class="arr">↗</span></span></a></li>
+          <li class="reveal"><a data-link="playlists" href="#" target="_blank" rel="noopener"><span class="n">06</span><span class="t">Travel diaries</span><span class="d">Road trips, scenery and serendipity around the South Island.</span><span class="go">Watch <span class="arr">↗</span></span></a></li>
+        </ol>
+          <a class="cover reveal" data-link="playlists" href="#" target="_blank" rel="noopener">
+            <img src="assets/covers/makers-journal.png" alt="The Maker’s Journal: knitting chronicles and cozy chats" width="1280" height="720" loading="lazy">
+            <span class="cover-cap"><span class="k">Series cover</span><span class="w">The Maker’s Journal <span class="arr">↗</span></span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CALLIGRAPHY INTERLUDE ============ -->
+    <section class="interlude" aria-label="Slow down, make something beautiful">
+      <div class="wrap center">
+        <span class="interlude-logo"><span data-plogo></span></span>
+        <p class="calli write script">slow down,<br>make something beautiful</p>
+        <p class="calli-ta write ta" lang="ta">மெதுவாக வாழ்வோம்</p>
+        <div class="doodle-row">
+          <span class="doodle" data-doodle="flower" data-size="96"></span>
+          <span class="doodle" data-doodle="fern" data-size="96"></span>
+          <span class="doodle" data-doodle="heart" data-size="72"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PATTERNS ============ -->
+    <section class="sec" id="patterns">
+      <div class="wrap split">
+        <div>
+          <p class="label reveal">Patterns</p>
+          <h2 class="reveal">Designed<br><em>by hand.</em></h2>
+        </div>
+        <div>
+          <p class="big reveal">Original patterns, sketched in my journal and tested at my own kitchen table.</p>
+          <p class="reveal">Got a stitch, a shape or a yarn you can't stop thinking about? Tell me what you'd love to make and I'll happily draw it up. Pattern design and tech-editing collaborations welcome too.</p>
+          <div class="cta-row reveal">
+            <a class="btn" data-contact="Pattern design" href="#">Ask about a pattern</a>
+            <a class="link" data-link="shop" href="#" target="_blank" rel="noopener">Browse the shop <span class="arr">↗</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHOP / KITS ============ -->
+    <section class="sec" id="shop">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="label reveal">Shop &amp; kits</p>
+            <h2 class="reveal">Yarn, kits<br><em>&amp; treasures.</em></h2>
+          </div>
+        </div>
+        <div class="plates">
+          <a class="plate reveal" data-link="shop" href="#" target="_blank" rel="noopener">
+            <span class="plate-no">No. 1</span>
+            <span class="doodle" data-doodle="flower" data-size="120"></span>
+            <h3>Planet Pearl<br><em>shop</em></h3>
+            <p>Things I've made and things I love, gathered in one cosy corner.</p>
+            <span class="go">Visit the shop <span class="arr">↗</span></span>
+          </a>
+          <a class="plate dark reveal" data-link="craftclub" href="#" target="_blank" rel="noopener">
+            <span class="plate-no">No. 2</span>
+            <span class="doodle" data-doodle="sprig" data-size="120"></span>
+            <h3>Craft Club<br><em>kits</em></h3>
+            <p>Up to 70% off through my link, plus an extra 10% with the code <strong class="code" data-code>PEARLINJACOB10</strong> at checkout.</p>
+            <span class="go">Shop Craft Club <span class="arr">↗</span></span>
+            <small class="fine">Affiliate link: I may earn a small commission at no extra cost to you.</small>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ JOURNAL / SOCIAL ============ -->
+    <section class="sec" id="journal">
+      <div class="wrap">
+        <p class="label reveal">Elsewhere</p>
+        <h2 class="reveal">Little moments,<br><em>everywhere.</em></h2>
+        <div class="cols">
+          <a class="col reveal" data-link="blog" href="#" target="_blank" rel="noopener"><span class="k">Read</span><span class="w">The blog</span><span class="d">Longer stories, notes and makes at planetpearlliving.com.</span><span class="arr">↗</span></a>
+          <a class="col reveal" data-link="instagram" href="#" target="_blank" rel="noopener"><span class="k">Follow</span><span class="w">Instagram</span><span class="d">Works in progress and pretty yarn, @planetpearlliving.</span><span class="arr">↗</span></a>
+          <a class="col reveal" data-link="facebook" href="#" target="_blank" rel="noopener"><span class="k">Join</span><span class="w">Facebook</span><span class="d">Come and chat with the Planet Pearl community.</span><span class="arr">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="sec hello" id="hello">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="label reveal">Contact</p>
+            <h2 class="reveal">Let's make<br><em>something.</em></h2>
+          </div>
+          <p class="sub reveal">Collaborations, yarn questions, pattern ideas, or just a friendly hello. I read everything with a cup of tea.</p>
+        </div>
+        <div class="cols three">
+          <a class="col reveal" data-contact="Collaboration" href="#"><span class="k">i.</span><span class="w">Collaborations</span><span class="d">Yarn brands, makers and fibre-friendly businesses, let's create together.</span><span class="arr">↗</span></a>
+          <a class="col reveal" data-contact="Yarn information" href="#"><span class="k">ii.</span><span class="w">Yarn information</span><span class="d">Wondering about a yarn, a weight or a colour I used? Ask away.</span><span class="arr">↗</span></a>
+          <a class="col reveal" data-contact="Pattern design" href="#"><span class="k">iii.</span><span class="w">Pattern design</span><span class="d">Commissions, custom sizing and designs you'd love to see.</span><span class="arr">↗</span></a>
+        </div>
+        <p class="bow reveal"><span class="script">with love, Pearl</span> <span class="ta" lang="ta">அன்புடன்</span><a class="mail" data-mail href="#"></a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span class="foot-logo"><span data-plogo></span></span>
+      <ul class="social">
+        <li><a data-link="youtube" href="#" target="_blank" rel="noopener">YouTube</a></li>
+        <li><a data-link="instagram" href="#" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a data-link="facebook" href="#" target="_blank" rel="noopener">Facebook</a></li>
+        <li><a data-link="blog" href="#" target="_blank" rel="noopener">Blog</a></li>
+        <li><a data-link="shop" href="#" target="_blank" rel="noopener">Shop</a></li>
+      </ul>
+      <p class="fine">Ōtautahi Christchurch, Aotearoa New Zealand. Some links are affiliate links; I only share things I love.</p>
+    </div>
+  </footer>
+
+  <!-- custom flower cursor -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/videos.js"></script>
+  <script src="js/yarn3d.js"></script>
+  <script src="js/threadsvg.js"></script>
+  <script src="js/cursor.js"></script>
+  <script src="js/watch.js"></script>
+  <script src="js/plogo.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

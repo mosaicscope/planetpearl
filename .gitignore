@@ -1,0 +1,6 @@
+.anchor/
+.superpowers/
+.claude/
+.playwright-mcp/
+node_modules/
+*.blend1
