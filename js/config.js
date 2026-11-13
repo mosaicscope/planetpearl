@@ -23,4 +23,15 @@ window.PP_CONFIG = {
 };
 
 /* The hero film rendered in Blender (frames in assets/hero/) */
-window.PP_CONFIG.film = { frames: 90, dir: 'assets/hero/f_', pad: 4, ext: 'webp', w: 840, h: 980, tailXFrac: 0.6155 };
+window.PP_CONFIG.film = { frames: 90, dir: 'assets/hero/f_', pad: 4, ext: 'webp', w: 840, h: 980, tailXFrac: 0.6155, useFrames: 52 };
+
+/* Things the locket (dev panel) can plug in. Visitors see them once they are
+   saved in the locket on your own browser, or pasted in here for everyone. */
+window.PP_CONFIG.social = {
+  instagramHandle: 'planetpearlliving',
+  instagramPosts: [],      // newest first, e.g. ['https://www.instagram.com/p/XXXXXXXX/']
+  pinterestBoard: '',      // e.g. 'https://www.pinterest.com/yourname/your-board/'
+  soundcloud: '',          // a SoundCloud playlist or track link
+  announcement: ''         // one friendly line shown above the title
+};
+window.PP_CONFIG.passcode = '1974';

@@ -20,7 +20,8 @@
   <canvas id="stage" aria-hidden="true"></canvas>
 
   <header class="nav" id="nav">
-    <div class="nav-logo"><span data-plogo></span></div>
+    <a class="brand" href="#top" aria-label="Planet Pearl, back to top">Planet Pearl</a>
+    <div class="nav-scene" id="scene"></div>
     <nav class="nav-links" id="nav-links" aria-label="Main">
       <a href="#watch">Watch</a>
       <a href="#patterns">Patterns</a>
@@ -41,13 +42,24 @@
         <div id="ball2d" aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="eyebrow"><span class="ta">வணக்கம்</span><i></i>Ōtautahi Christchurch, Aotearoa</p>
-          <h1><span class="write script">Planet Pearl</span></h1>
+          <h1 class="sr">Planet Pearl</h1>
+          <span class="hero-logo"><span data-plogo></span></span>
           <p class="lede">Dear friends, come in and get cosy. Knitting, quilting, slow living and a good cup of tea.</p>
           <div class="cta-row">
             <a class="btn" data-link="subscribe" href="#" target="_blank" rel="noopener">Subscribe on YouTube</a>
             <a class="link" href="#watch">Watch the journal <span class="arr">→</span></a>
           </div>
         </div>
+        <nav class="hero-index" aria-label="Where the thread leads">
+          <p class="hi-k">Follow the thread to</p>
+          <ol>
+            <li><a href="#watch"><span class="n">i.</span><span class="t">The films</span><span class="a">→</span></a></li>
+            <li><a href="#patterns"><span class="n">ii.</span><span class="t">Patterns, drawn by hand</span><span class="a">→</span></a></li>
+            <li><a href="#shop"><span class="n">iii.</span><span class="t">Yarn, kits &amp; treasures</span><span class="a">→</span></a></li>
+            <li><a href="#journal"><span class="n">iv.</span><span class="t">Little moments, everywhere</span><span class="a">→</span></a></li>
+            <li><a href="#hello"><span class="n">v.</span><span class="t">Say hello</span><span class="a">→</span></a></li>
+          </ol>
+        </nav>
         <p class="pull" aria-hidden="true">pull the thread <span>↓</span></p>
       </div>
     </section>
@@ -132,7 +144,9 @@
 
     <!-- ============ CALLIGRAPHY INTERLUDE ============ -->
     <section class="interlude" aria-label="Slow down, make something beautiful">
-      <div class="wrap center">
+      <div class="wrap interlude-grid">
+        <aside class="slot slot-ig" id="slot-ig"></aside>
+        <div class="interlude-mid">
         <span class="interlude-logo"><span data-plogo></span></span>
         <p class="calli write script">slow down,<br>make something beautiful</p>
         <p class="calli-ta write ta" lang="ta">மெதுவாக வாழ்வோம்</p>
@@ -141,6 +155,8 @@
           <span class="doodle" data-doodle="fern" data-size="96"></span>
           <span class="doodle" data-doodle="heart" data-size="72"></span>
         </div>
+        </div>
+        <aside class="slot slot-pin" id="slot-pin"></aside>
       </div>
     </section>
 
@@ -222,6 +238,7 @@
         <p class="bow reveal"><span class="script">with love, Pearl</span> <span class="ta" lang="ta">அன்புடன்</span><a class="mail" data-mail href="#"></a></p>
       </div>
     </section>
+    <div class="pool" id="pool" aria-hidden="true"></div>
   </main>
 
   <footer class="foot">
@@ -243,12 +260,16 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/videos.js"></script>
   <script src="js/yarn3d.js"></script>
   <script src="js/threadsvg.js"></script>
   <script src="js/cursor.js"></script>
   <script src="js/watch.js"></script>
   <script src="js/plogo.js"></script>
+  <script src="js/gramophone.js"></script>
+  <script src="js/social.js"></script>
+  <script src="js/locket.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

@@ -84,7 +84,7 @@
       engine = window.PPYarn.create(doc.getElementById('stage'), {
         heroTravel: heroTravel, filmRect: filmRect,
         footerH: function () { return doc.querySelector('.foot').offsetHeight; },
-        endY: function () { var e = doc.querySelector('.bow'); if (!e) return doc.documentElement.scrollHeight - 400; var r = e.getBoundingClientRect(); return r.top + window.scrollY + r.height / 2; }
+        endY: function () { var e = doc.getElementById('pool'); if (!e) return doc.documentElement.scrollHeight - 400; var r = e.getBoundingClientRect(); return r.top + window.scrollY + r.height / 2; }
       });
     } else startDrawn();
   } catch (err) {
@@ -93,7 +93,7 @@
   }
 
   /* ---------- main loop ---------- */
-  var copy = doc.querySelector('.hero-copy'), pull = doc.querySelector('.pull');
+  var copy = doc.querySelector('.hero-copy'), pull = doc.querySelector('.pull'), hi = doc.querySelector('.hero-index'), hiItems = hi ? hi.querySelectorAll('li') : [];
   var px = 0, py = 0, tpx = 0, tpy = 0;
   window.addEventListener('pointermove', function (e) {
     tpx = (e.clientX / window.innerWidth - 0.5) * 2; tpy = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -107,13 +107,15 @@
     if (mode === 'film') {
       if (changed !== false) engine.render();
       var w = Math.min(1, Math.max(0, sm / heroTravel()));
-      draw(Math.round(w * (F.frames - 1)));
+      draw(Math.round(w * ((F.useFrames || F.frames) - 1)));
       px += (tpx - px) * 0.05; py += (tpy - py) * 0.05;
       if (sm < heroTravel()) film.style.transform = (window.innerWidth <= 900 ? 'translateX(50%) ' : '') + 'translate3d(' + (px * -9) + 'px,' + (py * -6) + 'px,0)';
     }
-    var p = Math.min(1, Math.max(0, sm / (heroTravel() * 0.38)));
+    var ht = heroTravel(), pr = Math.min(1, Math.max(0, sm / ht));
+    var p = Math.min(1, Math.max(0, sm / (ht * 0.26)));
     copy.style.opacity = String(1 - p);
     copy.style.transform = 'translateY(' + (p * -28) + 'px)';
+    if (hi) { hi.classList.toggle('on', pr > 0.28); for (var q = 0; q < hiItems.length; q++) hiItems[q].classList.toggle('on', pr > 0.3 + q * 0.1); }
     if (pull) pull.style.opacity = String(1 - Math.min(1, sm / 120));
     requestAnimationFrame(frame);
   }
