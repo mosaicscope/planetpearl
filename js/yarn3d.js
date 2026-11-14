@@ -123,6 +123,46 @@
     var ropeMesh = new THREE.Mesh(new THREE.BufferGeometry(), yarnMat); ropeMesh.frustumCulled = false; scene.add(ropeMesh);
     var shellMesh = new THREE.Mesh(new THREE.BufferGeometry(), shellMat); shellMesh.frustumCulled = false; shellMesh.renderOrder = 2; scene.add(shellMesh);
 
+    /* ---------- planning a route through the open space ----------
+       The page is cut into rows. For every row we know which stretches are taken by words
+       or pictures, then we pick one x per row so the thread stays in open space, changing
+       lane gently (a smooth path) and finishing in the pool. */
+    function planLane(obs, W, y0, y1, x0, xEnd, clear) {
+      var STEP = 60, CELL = 18, nx = Math.max(8, Math.floor(W / CELL)), rows = Math.max(6, Math.ceil((y1 - y0) / STEP) + 1);
+      var lo = Math.floor(8 / CELL), hi = nx - 1 - lo, INF = 1e12;
+      var cost = new Array(rows), r, c, k;
+      for (r = 0; r < rows; r++) {
+        var ya = y0 + r * STEP - STEP / 2, yb = ya + STEP, list = [];
+        for (k = 0; k < obs.length; k++) if (obs[k].t < yb && obs[k].b > ya) list.push(obs[k]);
+        var row = new Float32Array(nx);
+        for (c = 0; c < nx; c++) {
+          var xl = c * CELL + CELL / 2 - clear, xr = xl + 2 * clear, o = 0;
+          for (k = 0; k < list.length; k++) { var a = Math.max(xl, list[k].l), b = Math.min(xr, list[k].r); if (b > a) o += b - a; }
+          row[c] = o * 3 + (c < lo || c > hi ? 400 : 0) + Math.abs(c * CELL - W / 2) * 0.004;
+        }
+        cost[r] = row;
+      }
+      var c0 = clamp(Math.round(x0 / CELL), 0, nx - 1), cE = clamp(Math.round(xEnd / CELL), 0, nx - 1), LAM = 5, MAXJ = 5;
+      var dp = new Array(rows), from = new Array(rows);
+      dp[0] = new Float32Array(nx).fill(INF); dp[0][c0] = 0; from[0] = new Int16Array(nx);
+      for (r = 1; r < rows; r++) {
+        dp[r] = new Float32Array(nx).fill(INF); from[r] = new Int16Array(nx);
+        for (c = 0; c < nx; c++) {
+          var best = INF, bj = c;
+          for (var j = Math.max(0, c - MAXJ); j <= Math.min(nx - 1, c + MAXJ); j++) { var v = dp[r - 1][j] + LAM * (c - j) * (c - j); if (v < best) { best = v; bj = j; } }
+          dp[r][c] = best >= INF ? INF : best + cost[r][c]; from[r][c] = bj;
+        }
+      }
+      var xs = new Array(rows), cur = cE;
+      for (r = rows - 1; r >= 0; r--) { xs[r] = cur * CELL + CELL / 2; cur = from[r][cur]; }
+      xs[0] = x0; xs[rows - 1] = xEnd;
+      // smooth it so the thread flows rather than steps
+      for (var pass = 0; pass < 3; pass++) for (r = 1; r < rows - 1; r++) xs[r] = (xs[r - 1] + 2 * xs[r] + xs[r + 1]) / 4;
+      var out = []; for (r = 0; r < rows; r++) out.push({ x: xs[r], y: y0 + r * STEP });
+      out[rows - 1].y = y1;
+      return out;
+    }
+
     /* ---------- layout ---------- */
     var W = 1, H = 1, visH = 4, visW = 6, upp = 0.005, heroTravel = 800, docH = 5000;
     var rest = [], cum = new Float32Array(2), N = 0, NM = 0, radiusW = 0.05, uvPerUnit = 1, SPACING = 0.07;
@@ -142,12 +182,11 @@
       var footH = opts.footerH ? opts.footerH() : 220;
       var poolY = opts.endY ? opts.endY() : docH - footH - H * 0.3;
       var Rpx = Math.min(150, W * 0.22), yEnd = poolY - 0.62 * Rpx;
-      var n = Math.max(5, Math.round((yEnd - y0) / (H * 0.5)));
-      var amp = Math.min(W * 0.3, 420), px = [{ x: x0, y: y0 }, { x: x0, y: y0 + H * 0.22 }];
-      for (var k = 1; k <= n; k++) {
-        var dir = k % 2 ? -1 : 1, y = y0 + H * 0.22 + (yEnd - y0 - H * 0.22) * k / n;
-        px.push({ x: k === n ? W * 0.5 : W * 0.5 + dir * amp * (0.55 + 0.45 * Math.sin(k * 1.9 + 0.5)), y: y });
-      }
+      var radiusPx = 0.0152 * film.width, clearPx = radiusPx + 22;
+      var obs = opts.obstacles ? opts.obstacles() : [];
+      var yStart = y0 + H * 0.22, px = [{ x: x0, y: y0 }, { x: x0, y: yStart }];
+      var lane = planLane(obs, W, yStart, yEnd, x0, W * 0.5, clearPx);
+      for (var li = 1; li < lane.length; li++) px.push(lane[li]);
       var ctrl = px.map(function (p, i) { return new THREE.Vector3((p.x - W / 2) * upp, -upp * p.y, 0.5 * Math.sin(i * 1.1)); });
       ctrl[0].z = 0; ctrl[1].z = 0;
       var curve = new THREE.CatmullRomCurve3(ctrl, false, 'catmullrom', 0.5);

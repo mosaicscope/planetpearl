@@ -7,6 +7,8 @@
 window.PP_VIDEOS = {
   channelId: 'UCoY-czK_liaNlisoE0uLrGg',
   uploadsPlaylist: 'UUoY-czK_liaNlisoE0uLrGg',   // every upload, newest first
+  // four films to meet Pearl with: change these ids whenever you like
+  featured: ['S54gmw1_6iY', 'ZmkczFVs8b8', 'Cx8xcDLTvVo', 'p-Rl4dwkP2U'],
   list: [
     ['gi7YTsyEkRw', 'Cozy Craft Podcast| Seroto Socks,Spice of Life Crochet Blanket,Christmas Makes & a little catch up', '25:15', '2026-11-04'],
     ['YI8cExhiIJ4', 'The Tapestry of My Life | Threads That Shaped', '2:19', '2026-10-21'],
