@@ -109,7 +109,14 @@
       var w = Math.min(1, Math.max(0, sm / heroTravel()));
       draw(Math.round(w * ((F.useFrames || F.frames) - 1)));
       px += (tpx - px) * 0.05; py += (tpy - py) * 0.05;
-      if (sm < heroTravel()) film.style.transform = (window.innerWidth <= 900 ? 'translateX(50%) ' : '') + 'translate3d(' + (px * -9) + 'px,' + (py * -6) + 'px,0)';
+      var phone = window.innerWidth <= 900;
+      var lift = 0;
+      if (phone) {   // sits low at the start, rises a little, stays below the chapter list, then settles into the thread
+        var endL = window.innerHeight < 741 ? 0.3 : 0.24, a1 = Math.min(1, w / 0.45), L = 0.5 - (0.5 - endL) * a1;
+        if (w > 0.85) L = endL * (1 - (w - 0.85) / 0.15);
+        lift = L * film.offsetHeight;
+      }
+      film.style.transform = (phone ? 'translateX(50%) ' : '') + 'translate3d(' + (sm < heroTravel() ? px * -9 : 0) + 'px,' + ((sm < heroTravel() ? py * -6 : 0) + lift) + 'px,0)';
     }
     var ht = heroTravel(), pr = Math.min(1, Math.max(0, sm / ht));
     var p = Math.min(1, Math.max(0, sm / (ht * 0.26)));
@@ -121,8 +128,14 @@
   }
   requestAnimationFrame(frame);
 
-  function relayout() { if (engine && engine.layout) engine.layout(); }
-  window.addEventListener('resize', relayout);
+  // iPhone Safari fires "resize" whenever its toolbars slide in and out; ignore those height-only wobbles
+  var lastW = window.innerWidth, lastHt = window.innerHeight;
+  function relayout(force) { if (engine && engine.layout) engine.layout(); }
+  window.addEventListener('resize', function () {
+    var wChanged = window.innerWidth !== lastW, big = Math.abs(window.innerHeight - lastHt) > 160;
+    if (!wChanged && !big) return;
+    lastW = window.innerWidth; lastHt = window.innerHeight; relayout();
+  });
   window.addEventListener('load', relayout);
   if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(relayout);
   var lastH = 0;
