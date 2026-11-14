@@ -258,7 +258,6 @@
 
     function render() { renderer.render(scene, camera); }
     layout();
-    window.addEventListener('resize', layout);
     return { update: update, render: render, layout: layout, destroy: function () { renderer.dispose(); } };
   }
 

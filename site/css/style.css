@@ -610,3 +610,23 @@ a.slot-card:hover::after{inset:14px;border-color:var(--berry)}
   .nav-scene.open::after{display:none}
 }
 @media (max-width:520px){.nav-scene{--sl:6.6rem}}
+
+/* ----- phones: a big logo, and a big ball of yarn that peeks up from the bottom ----- */
+@media (max-width:900px){
+  .hero-logo .plogo{width:clamp(180px,54vw,250px)}
+  .hero-copy{top:4.7rem}
+  #film{top:auto;bottom:0;height:min(78vh,700px);height:min(78svh,700px);width:auto;right:50%}
+  .cta-row{margin-top:.6rem}
+}
+@media (max-width:900px) and (max-height:740px){
+  .lede{display:none}
+  .hero-logo .plogo{width:clamp(160px,46vw,210px)}
+  #hero-surprise{display:none}
+}
+/* iPhone: no full-screen grain (it is heavy there) */
+@media (hover:none){.grain{display:none}}
+
+@media (max-width:900px) and (max-height:740px){
+  .hero-index a{padding:.4rem .1rem}
+  .hero-index .t{font-size:1.2rem}
+}
