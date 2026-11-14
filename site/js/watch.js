@@ -24,20 +24,21 @@
     a.card.classList.remove('previewing');
     if (a.frame) { var f = a.frame; f.classList.remove('on'); setTimeout(function () { f.remove(); }, 500); }
   }
+  function startPreview(card, box, id) {
+    stopPreview();
+    var f = doc.createElement('iframe'); f.className = 'pv'; f.title = ''; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+    f.allow = 'autoplay; encrypted-media'; f.loading = 'lazy';
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=' + id + '&modestbranding=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&start=6';
+    box.appendChild(f); active = { card: card, frame: f, t: 0 };
+    f.addEventListener('load', function () { f.classList.add('on'); card.classList.add('previewing'); });
+  }
   function attachPreview(card, box, id) {
     if (!canHover) return;
     var timer = 0;
     card.addEventListener('pointerenter', function (e) {
       if (e.pointerType === 'touch') return;
       clearTimeout(timer);
-      timer = setTimeout(function () {
-        stopPreview();
-        var f = doc.createElement('iframe'); f.className = 'pv'; f.title = ''; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
-        f.allow = 'autoplay; encrypted-media'; f.loading = 'lazy';
-        f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=' + id + '&modestbranding=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&start=6';
-        box.appendChild(f); active = { card: card, frame: f, t: 0 };
-        f.addEventListener('load', function () { f.classList.add('on'); card.classList.add('previewing'); });
-      }, 420);
+      timer = setTimeout(function () { startPreview(card, box, id); }, 420);
     });
     card.addEventListener('pointerleave', function () { clearTimeout(timer); if (active && active.card === card) stopPreview(); });
     card.addEventListener('focusout', function () { clearTimeout(timer); if (active && active.card === card) stopPreview(); });
@@ -56,6 +57,14 @@
   fb.addEventListener('click', function () { stopPreview(); open(f[0], f[1]); });
   attachPreview(fb, fi, f[0]);
   feature.appendChild(fb);
+  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var fTimer = 0;
+    new IntersectionObserver(function (en) {
+      clearTimeout(fTimer);
+      if (en[0].isIntersecting && en[0].intersectionRatio > 0.6) fTimer = setTimeout(function () { if (!active) startPreview(fb, fi, f[0]); }, 1100);
+      else if (active && active.card === fb) stopPreview();
+    }, { threshold: [0, 0.6, 1] }).observe(fb);
+  }
 
   /* ---------- filmstrip ---------- */
   var STRIP_N = 30;
@@ -101,6 +110,8 @@
     lb.hidden = false; doc.documentElement.classList.add('lb-open'); x.focus();
   }
   function open(id, title) {
+    try { localStorage.setItem('pp_last', JSON.stringify({ id: id, title: title })); } catch (e) {}
+    doc.dispatchEvent(new CustomEvent('pp:played', { detail: { id: id, title: title } }));
     show('https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1', title, 'https://www.youtube.com/watch?v=' + id);
   }
   function close() {
@@ -111,6 +122,15 @@
   lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
   doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) close(); });
 
+  window.PPFilm = {
+    open: function (id, title) { stopPreview(); open(id, title); },
+    surprise: function (pred) {
+      var pool = V.list.filter(function (v) { return !pred || pred(v[1].toLowerCase()); });
+      var v = pool[(Math.random() * pool.length) | 0];
+      if (v) { stopPreview(); open(v[0], v[1]); } return v;
+    },
+    mood: function () {}
+  };
   /* ---------- the whole archive: chapters, newest first, with search ---------- */
   var CHAPTERS = [
     { from: '2026-01-01', yr: '2026', t: 'Pockets of peace', b: 'A year of little moments: knitting, quilting and community, Woolfeast and a Dunedin yarn retreat, a Peggy Square blanket, a trip home to India for Pongal, and an emotional support chicken.' },
@@ -162,10 +182,23 @@
       if (!res.length) { grid.appendChild(el('p', 'empty', 'Nothing with that word yet. Try yarn, quilt, retreat or garden.')); return; }
       var gr = el('div', 'vgrid-in'); res.forEach(function (r) { gr.appendChild(cellFor(r.v, r.i, '')); }); grid.appendChild(gr);
     };
+    var renderFiltered = function (pred, label) {
+      grid.textContent = '';
+      var res = items.filter(function (r) { return pred(r.v[1].toLowerCase()); });
+      count.textContent = res.length + (res.length === 1 ? ' film' : ' films') + ' · ' + label;
+      if (!res.length) { grid.appendChild(el('p', 'empty', 'Nothing here yet.')); return; }
+      var gr = el('div', 'vgrid-in'); res.forEach(function (r) { gr.appendChild(cellFor(r.v, r.i, '')); }); grid.appendChild(gr);
+    };
+    window.PPFilm.mood = function (pred, label) {
+      if (!pred) { q.value = ''; renderChapters(); return; }
+      q.value = ''; renderFiltered(pred, label);
+      var target = doc.getElementById('q'); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
     q.addEventListener('input', function () { var t = q.value.trim().toLowerCase(); if (t) renderSearch(t); else renderChapters(); });
     renderChapters();
   }
 
+  window.PPFilm = window.PPFilm || {};
   var all = doc.getElementById('playall');
   if (all) all.addEventListener('click', function () {
     show('https://www.youtube-nocookie.com/embed/videoseries?list=' + V.uploadsPlaylist + '&autoplay=1&rel=0', 'Every Planet Pearl film, newest first', 'https://www.youtube.com/@planetpearl/videos');

@@ -39,6 +39,13 @@
   var tg = sv('g', { transform: 'translate(7 41) scale(.23)' }, ts);
   sv('path', { d: HEART, fill: '#ffc2d1', stroke: '#3d1127', 'stroke-width': 7, 'stroke-linejoin': 'round' }, tg);
   sv('path', { d: 'M100,60 a14,14 0 1,1 .1,0 M92,72 L88,104 L112,104 L108,72', fill: 'none', stroke: '#3d1127', 'stroke-width': 7, 'stroke-linejoin': 'round' }, tg);
+  function revealed() {
+    try {
+      if (/[?&]locket\b/.test(location.search) || location.hash === '#locket') localStorage.setItem('pp_locket', '1');
+      return localStorage.getItem('pp_locket') === '1';
+    } catch (e) { return /[?&]locket\b/.test(location.search) || location.hash === '#locket'; }
+  }
+  trigger.hidden = !revealed();
   doc.body.appendChild(trigger);
 
   /* ---------- the modal ---------- */
@@ -116,8 +123,9 @@
     field(g4, 'code', 'Discount code', 'text').value = saved.discountCode || C.discountCode || '';
     panel.appendChild(g4);
 
-    var row = el('div', 'lk-row'), save = el('button', 'btn', 'Save & refresh'), copy = el('button', 'link', 'Copy for the site'), reset = el('button', 'link', 'Forget my changes'), lock = el('button', 'link', 'Lock again');
-    [save, copy, reset, lock].forEach(function (b) { b.type = 'button'; row.appendChild(b); });
+    var row = el('div', 'lk-row'), save = el('button', 'btn', 'Save & refresh'), copy = el('button', 'link', 'Copy for the site'), reset = el('button', 'link', 'Forget my changes'), lock = el('button', 'link', 'Lock again'), hideIt = el('button', 'link', 'Hide the locket');
+    [save, copy, reset, lock, hideIt].forEach(function (b) { b.type = 'button'; row.appendChild(b); });
+    hideIt.addEventListener('click', function () { try { localStorage.removeItem('pp_locket'); sessionStorage.removeItem('pp_unlocked'); } catch (e) {} msg.textContent = 'Hidden. Add ?locket to the address, or type the word locket, to bring it back.'; setTimeout(function () { location.replace(location.pathname); }, 1200); });
     var msg = el('p', 'lk-msg'); msg.setAttribute('aria-live', 'polite');
     panel.appendChild(row); panel.appendChild(msg);
 
@@ -162,6 +170,13 @@
   }
   function shut() { modal.hidden = true; doc.documentElement.classList.remove('lk-lock'); trigger.focus(); }
   trigger.addEventListener('click', open);
+  // typing the word "locket" anywhere (not in a form field) brings it out
+  var typed = '';
+  doc.addEventListener('keydown', function (e) {
+    if (!modal.hidden || (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) || e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-6);
+    if (typed === 'locket') { try { localStorage.setItem('pp_locket', '1'); } catch (er) {} trigger.hidden = false; typed = ''; open(); }
+  });
   close.addEventListener('click', shut); scrim.addEventListener('click', shut);
   doc.addEventListener('keydown', function (e) {
     if (modal.hidden) return;
