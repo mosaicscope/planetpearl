@@ -84,6 +84,22 @@
       engine = window.PPYarn.create(doc.getElementById('stage'), {
         heroTravel: heroTravel, filmRect: filmRect,
         footerH: function () { return doc.querySelector('.foot').offsetHeight; },
+        obstacles: function () {
+          var out = [], sy = window.scrollY, hero = doc.querySelector('.hero');
+          var heroBottom = hero ? hero.getBoundingClientRect().bottom + sy : 0;
+          function push(r, pad) { if (r.width < 2 || r.height < 2) return; var t = r.top + sy; if (t + r.height < heroBottom) return; out.push({ l: r.left, r: r.right, t: t - (pad || 0), b: t + r.height + (pad || 0) }); }
+          // words: use each line's real extent, not the whole block
+          doc.querySelectorAll('main h2,main h3,main p,main li,main .t,main .d,main .w,main .k,main .go,main .ti,main .no,main .dur,main .label,main .big,main .ch-yr,main .calli,main .calli-ta,main .mo-k,main .cont,main dd,main dt,main .count,main .chip,main .btn,main .link,main legend,main input').forEach(function (n) {
+            if (n.closest('.hero') || n.closest('.hero-pin')) return;
+            var rg = doc.createRange(); rg.selectNodeContents(n);
+            var rs = rg.getClientRects(); for (var i = 0; i < rs.length; i++) push(rs[i], 44);
+          });
+          // pictures and boxes
+          doc.querySelectorAll('main .th,main .feat-img,main .cover,main .plate,main .slot-card,main .ig-embed,main .pin-embed,main .plogo,main .archive-tools,main .cell,main .moods .mo-row').forEach(function (n) {
+            if (n.closest('.hero')) return; push(n.getBoundingClientRect(), 44);
+          });
+          return out;
+        },
         endY: function () { var e = doc.getElementById('pool'); if (!e) return doc.documentElement.scrollHeight - 400; var r = e.getBoundingClientRect(); return r.top + window.scrollY + r.height / 2; }
       });
     } else startDrawn();

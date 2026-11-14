@@ -81,18 +81,73 @@
   }
   V.list.slice(0, STRIP_N).forEach(function (v, i) { strip.appendChild(cellFor(v, i, ' reveal')); });
 
-  var step = function () { return Math.max(260, strip.clientWidth * 0.8); };
-  doc.getElementById('prev').addEventListener('click', function () { strip.scrollBy({ left: -step(), behavior: 'smooth' }); });
-  doc.getElementById('next').addEventListener('click', function () { strip.scrollBy({ left: step(), behavior: 'smooth' }); });
+  // every strip scrolls with arrows, by dragging with a mouse, and by touch
+  var dragged = false;
+  function wireStrip(stripEl, prev, next) {
+    var stepBy = function () { return Math.max(260, stripEl.clientWidth * 0.8); };
+    if (prev) prev.addEventListener('click', function () { stripEl.scrollBy({ left: -stepBy(), behavior: 'smooth' }); });
+    if (next) next.addEventListener('click', function () { stripEl.scrollBy({ left: stepBy(), behavior: 'smooth' }); });
+    var down = false, sx = 0, sl = 0;
+    stripEl.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; down = true; dragged = false; sx = e.clientX; sl = stripEl.scrollLeft; });
+    window.addEventListener('pointermove', function (e) {
+      if (!down) return; var dx = e.clientX - sx; if (Math.abs(dx) > 5) { dragged = true; stripEl.classList.add('drag'); }
+      stripEl.scrollLeft = sl - dx;
+    });
+    window.addEventListener('pointerup', function () { down = false; stripEl.classList.remove('drag'); setTimeout(function () { dragged = false; }, 0); });
+  }
+  wireStrip(strip, doc.getElementById('prev'), doc.getElementById('next'));
 
-  // drag to scroll with a mouse
-  var down = false, sx = 0, sl = 0, dragged = false;
-  strip.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; down = true; dragged = false; sx = e.clientX; sl = strip.scrollLeft; });
-  window.addEventListener('pointermove', function (e) {
-    if (!down) return; var dx = e.clientX - sx; if (Math.abs(dx) > 5) { dragged = true; strip.classList.add('drag'); }
-    strip.scrollLeft = sl - dx;
+  /* ---------- start here: four films to meet Pearl with ---------- */
+  var startRow = doc.getElementById('startrow');
+  if (startRow && V.featured && V.featured.length) {
+    var byId = {}; V.list.forEach(function (x) { byId[x[0]] = x; });
+    var head = el('div', 'sr-head reveal'), hl = el('div'); var h3 = el('h3'); h3.appendChild(doc.createTextNode('Start ')); h3.appendChild(el('em', null, 'here.')); hl.appendChild(h3);
+    head.appendChild(hl); head.appendChild(el('p', null, 'New around here? These four feel like sitting down with me.'));
+    startRow.appendChild(head);
+    var picks = el('div', 'picks');
+    V.featured.forEach(function (id, i) {
+      var vid = byId[id]; if (!vid) return;
+      var p = el('button', 'pick reveal'); p.type = 'button'; p.setAttribute('aria-label', 'Play: ' + vid[1]);
+      var im2 = el('img'); im2.src = thumb(id); im2.alt = ''; im2.loading = 'lazy'; p.appendChild(im2);
+      p.appendChild(el('span', 'n', '0' + (i + 1)));
+      p.appendChild(el('span', 'play'));
+      var cap2 = el('span', 'cap'); cap2.appendChild(el('span', 't', vid[1])); cap2.appendChild(el('span', 'm', vid[2] + ' \u00b7 ' + fmt(vid[3]))); p.appendChild(cap2);
+      p.addEventListener('click', function () { stopPreview(); open(vid[0], vid[1]); });
+      attachPreview(p, p, id);
+      picks.appendChild(p);
+    });
+    startRow.appendChild(picks);
+  }
+
+  /* ---------- more rows, each a different reason to press play ---------- */
+  var rowsHost = doc.getElementById('rows');
+  function has(words) { return function (t) { for (var i = 0; i < words.length; i++) if (t.indexOf(words[i]) > -1) return true; return false; }; }
+  var ROWS = [
+    ['Quick cosy watches', 'Under ten minutes. Just right with a cuppa.', function (x) { return secs(x[2]) < 600; }],
+    ['Craft along', 'Knitting, crochet and quilting, hands busy.', function (x) { return has(['knit', 'crochet', 'quilt', 'sock', 'kawandi', 'blanket'])(x[1].toLowerCase()); }],
+    ['Settle in', 'Twenty minutes or more. Blanket recommended.', function (x) { return secs(x[2]) >= 1200; }]
+  ];
+  if (rowsHost) ROWS.forEach(function (r) {
+    var list = V.list.filter(r[2]).slice(0, 14); if (list.length < 3) return;
+    var blk = el('div', 'rowblock reveal'), rh = el('div', 'rb-head'), tl = el('div');
+    tl.appendChild(el('h3', null, r[0])); tl.appendChild(el('p', null, r[1])); rh.appendChild(tl);
+    var nav = el('div', 'strip-nav'), pb = el('button', null, '\u2190'), nb = el('button', null, '\u2192'); pb.type = nb.type = 'button'; pb.setAttribute('aria-label', 'Earlier'); nb.setAttribute('aria-label', 'Later');
+    nav.appendChild(pb); nav.appendChild(nb); rh.appendChild(nav);
+    var st = el('div', 'strip'); st.tabIndex = 0; st.setAttribute('aria-label', r[0]);
+    list.forEach(function (x) { st.appendChild(cellFor(x, V.list.indexOf(x), '')); });
+    blk.appendChild(rh); blk.appendChild(st); rowsHost.appendChild(blk); wireStrip(st, pb, nb);
   });
-  window.addEventListener('pointerup', function () { down = false; strip.classList.remove('drag'); setTimeout(function () { dragged = false; }, 0); });
+
+  // lamplight that follows the pointer, and slow drifting dust in the beam
+  var cin = doc.querySelector('.cinema');
+  if (cin) {
+    cin.addEventListener('pointermove', function (e) { var r = cin.getBoundingClientRect(); cin.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%'); cin.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%'); });
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) for (var mi = 0; mi < 22; mi++) {
+      var m = el('span', 'mote'), sz = 3 + Math.random() * 7;
+      m.style.cssText = 'left:' + (Math.random() * 100) + '%;top:' + (Math.random() * 100) + '%;width:' + sz + 'px;height:' + sz + 'px;animation-delay:' + (-Math.random() * 14) + 's;animation-duration:' + (11 + Math.random() * 10) + 's';
+      cin.appendChild(m);
+    }
+  }
 
   /* ---------- lightbox ---------- */
   var lb = el('div', 'lb'); lb.hidden = true; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'Video player');
